@@ -3,15 +3,29 @@ class MoviesController < ApplicationController
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
-
+  
+  def index
+    @sort = params[:sort]
+    @movies = Movie.all
+    if @sort == "title"
+      @movies = @movies.sort_by{|m| m[:title]}
+    elsif @sort == "release_date"
+      @movies = @movies.sort_by{|m| m[:release_date]}
+    end
+  end
+  
+  def highlighted field
+    if params[:sort].to_s == field
+      return hilite
+    else
+      return nil
+    end
+  end
+  
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
-  end
-
-  def index
-    @movies = Movie.all
   end
 
   def new
