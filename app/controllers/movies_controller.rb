@@ -5,30 +5,48 @@ class MoviesController < ApplicationController
   end
   
   def index
-    @sort = params[:sort]
     @movies = Movie.all
     @all_ratings = Array.new
     
+    if params[:ratings].nil? && !session[:ratings].nil?
+      @selected = session[:ratings]
+    elsif !params[:ratings].nil?
+      @selected = params[:ratings].keys
+    else
+      @selected = Array.new
+    end
+    
+    if params[:sort].nil? && !session[:sort].nil?
+      @sort = session[:sort]
+    elsif !params[:sort].nil?
+      @sort = params[:sort]
+    end
+    
     @movies.each{|m|
       if !@all_ratings.include?(m.rating.to_s)
-        @all_ratings.insert(@all_ratings.length,m.rating.to_s)
+        @all_ratings << m.rating.to_s
       end
     }
     
-    if !params[:ratings].nil?
+    if !@selected.nil? && !@selected.empty?
       @movies.each{|m|
-        if !params[:ratings].has_key?(m.rating)
+        if !@selected.include?(m.rating)
           @movies -= [m]
         end
       }
+      session[:ratings] = params[:ratings]
     end
     
     if @sort == "title"
       @movies = @movies.sort_by{|m| m[:title]}
+      session[:sort] = @sort
     elsif @sort == "release_date"
       @movies = @movies.sort_by{|m| m[:release_date]}
+      session[:sort] = @sort
     end
   end
+  
+  
   
   def show
     id = params[:id] # retrieve movie ID from URI route
