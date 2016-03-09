@@ -6,15 +6,16 @@ class MoviesController < ApplicationController
   
   def index
     @movies = Movie.all
-    @all_ratings = Array.new
-    
+
     if params[:ratings].nil? && !session[:ratings].nil?
       @selected = session[:ratings]
+    elsif params[:ratings].nil? && session[:ratings].nil?
+      @selected = ['G','PG','PG-13','R']
     elsif !params[:ratings].nil?
       @selected = params[:ratings].keys
-    else
-      @selected = Array.new
     end
+    
+    @all_ratings = ['G','PG','PG-13','R']
     
     if params[:sort].nil? && !session[:sort].nil?
       @sort = session[:sort]
@@ -22,11 +23,11 @@ class MoviesController < ApplicationController
       @sort = params[:sort]
     end
     
-    @movies.each{|m|
-      if !@all_ratings.include?(m.rating.to_s)
-        @all_ratings << m.rating.to_s
-      end
-    }
+    if @selected.respond_to? 'keys'
+      @movies = Movie.where(rating: @selected.keys)
+    else
+      @movies = Movie.where(rating: @selected)
+    end
     
     if !@selected.nil? && !@selected.empty?
       @movies.each{|m|
