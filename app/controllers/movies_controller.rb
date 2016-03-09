@@ -7,18 +7,26 @@ class MoviesController < ApplicationController
   def index
     @sort = params[:sort]
     @movies = Movie.all
+    @all_ratings = Array.new
+    
+    @movies.each{|m|
+      if !@all_ratings.include?(m.rating.to_s)
+        @all_ratings.insert(@all_ratings.length,m.rating.to_s)
+      end
+    }
+    
+    if !params[:ratings].nil?
+      @movies.each{|m|
+        if !params[:ratings].has_key?(m.rating)
+          @movies -= [m]
+        end
+      }
+    end
+    
     if @sort == "title"
       @movies = @movies.sort_by{|m| m[:title]}
     elsif @sort == "release_date"
       @movies = @movies.sort_by{|m| m[:release_date]}
-    end
-  end
-  
-  def highlighted field
-    if params[:sort].to_s == field
-      return hilite
-    else
-      return nil
     end
   end
   
