@@ -5,22 +5,21 @@ class MoviesController < ApplicationController
   end
   
   def index
-    @movies = Movie.all
-
-    if params[:ratings].nil? && !session[:ratings].nil?
-      @selected = session[:ratings]
-    elsif params[:ratings].nil? && session[:ratings].nil?
-      @selected = ['G','PG','PG-13','R']
-    elsif !params[:ratings].nil?
-      @selected = params[:ratings].keys
-    end
-    
     @all_ratings = ['G','PG','PG-13','R']
     
-    if params[:sort].nil? && !session[:sort].nil?
-      @sort = session[:sort]
-    elsif !params[:sort].nil?
+    if !params[:ratings].nil?
+      @selected = params[:ratings]
+    elsif !session[:ratings].nil?
+      @selected = session[:ratings]
+    else
+      @selected = @all_ratings
+      redirect_to action: 'index', :ratings => @all_ratings
+    end
+    
+    if !params[:sort].nil?
       @sort = params[:sort]
+    elsif !session[:sort].nil?
+      @sort = session[:sort]
     end
     
     if @selected.respond_to? 'keys'
@@ -46,8 +45,6 @@ class MoviesController < ApplicationController
       session[:sort] = @sort
     end
   end
-  
-  
   
   def show
     id = params[:id] # retrieve movie ID from URI route
