@@ -11,6 +11,7 @@ class MoviesController < ApplicationController
       @selected = params[:ratings]
     elsif !session[:ratings].nil?
       @selected = session[:ratings]
+      redirect_to action: 'index', :ratings => @selected
     else
       @selected = @all_ratings
       redirect_to action: 'index', :ratings => @all_ratings
@@ -19,7 +20,7 @@ class MoviesController < ApplicationController
     if !params[:sort].nil?
       @sort = params[:sort]
     elsif !session[:sort].nil?
-      @sort = session[:sort]
+      redirect_to action: 'index', :sort => session[:sort]
     end
     
     if @selected.respond_to? 'keys'
