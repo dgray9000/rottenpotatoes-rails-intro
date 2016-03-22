@@ -9,6 +9,7 @@ class MoviesController < ApplicationController
     
     if !params[:ratings].nil?
       @selected = params[:ratings]
+      session[:ratings] = @selected
     elsif !session[:ratings].nil?
       @selected = session[:ratings]
       #redirect_to action: 'index', :ratings => session[:ratings]
@@ -19,6 +20,7 @@ class MoviesController < ApplicationController
     
     if !params[:sort].nil?
       @sort = params[:sort]
+      session[:sort] = @sort
     elsif !session[:sort].nil?
       redirect_to action: 'index', :ratings => @selected, :sort => session[:sort]
     end
@@ -29,21 +31,10 @@ class MoviesController < ApplicationController
       @movies = Movie.where(rating: @selected)
     end
     
-    if !@selected.nil? && !@selected.empty?
-      @movies.each{|m|
-        if !@selected.include?(m.rating)
-          @movies -= [m]
-        end
-      }
-      session[:ratings] = params[:ratings]
-    end
-    
     if @sort == "title"
       @movies = @movies.sort_by{|m| m[:title]}
-      session[:sort] = @sort
     elsif @sort == "release_date"
       @movies = @movies.sort_by{|m| m[:release_date]}
-      session[:sort] = @sort
     end
   end
   
