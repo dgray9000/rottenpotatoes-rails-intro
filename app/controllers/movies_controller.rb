@@ -13,6 +13,7 @@ class MoviesController < ApplicationController
       @selected = session[:ratings]
     else
       @selected = @all_ratings
+      redirect_to action: 'index', :ratings => @all_ratings
     end
     
     if !params[:sort].nil?
